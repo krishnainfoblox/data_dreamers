@@ -37,6 +37,8 @@ properties = {
     "driver": "com.amazon.redshift.jdbc.Driver"
 }
 
+
+
 # Define functions
 def check_nulls(schema_name):
     spark = SparkSession.builder.getOrCreate()
