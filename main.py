@@ -39,6 +39,8 @@ properties = {
 
 
 
+
+
 # Define functions
 def check_nulls(schema_name):
     spark = SparkSession.builder.getOrCreate()
