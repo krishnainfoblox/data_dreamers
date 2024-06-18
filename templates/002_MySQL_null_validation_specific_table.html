@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primary Key Check</title>
+    <title>MYSQL SPECIFIC TABLE NULL VALIDATION</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script>
-        var resultDisplayed = {{ 'true' if result else 'false' }};
+        var startTime = {{ start_time }};
     </script>
 </head>
 
 
 <body>
     <div class="container">
-        <h1>Primary Key Check</h1>
+        <h1>MYSQL SPECIFIC TABLE NULL VALIDATION</h1>
         <form method="POST">
             <label for="schema">Schema Name:</label>
             <input type="text" id="schema" name="schema" required>
@@ -25,18 +25,12 @@
             <input type="text" id="column" name="column" required>
             <button type="submit">Validate</button>
         </form>
-        <div class="TIME">
-            <p>System Time: <span id="system_time"></span></p>
-            <p>Elapsed Time: <span id="elapsed_time"></span></p>
-        </div>
-
         {% if result %}
         <div class="result">
             <h2>Result:</h2>
             {{ result|safe }}
-            <div class="TIME_elapsed">
             <p>Elapsed Time: <span id="elapsed_time"></span></p>
-        </div>
+            <p>System Time: <span id="system_time"></span></p>
         </div>
         {% endif %}
     </div>

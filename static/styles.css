@@ -55,6 +55,22 @@ h1 {
     background-color: #8a2be2;
 }
 
+.button:nth-child(5) {
+    background-color: #1e90ff;
+}
+
+.button:nth-child(6) {
+    background-color: #32cd32;
+}
+
+.button:nth-child(7) {
+    background-color: #ff4500;
+}
+
+.button:nth-child(8) {
+    background-color: #8a2be2;
+}
+
 .button:hover {
     transform: scale(1.05);
     box-shadow: 3px 3px 7px #666;

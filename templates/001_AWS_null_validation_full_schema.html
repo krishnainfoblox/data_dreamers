@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS FULL SCHEMA NULL VALIDATION</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <script>
+        var startTime = {{ start_time }};
+    </script>
+</head>
+
+
+<body>
+    <div class="container">
+        <h1>AWS FULL SCHEMA NULL VALIDATION</h1>
+        <form method="POST">
+            <label for="schema">Schema Name:</label>
+            <input type="text" id="schema" name="schema" required>
+            <button type="submit">Validate</button>
+        </form>
+        {% if result %}
+        <div class="result">
+            <h2>Result:</h2>
+            {{ result|safe }}
+            <p>Elapsed Time: <span id="elapsed_time"></span></p>
+            <p>System Time: <span id="system_time"></span></p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

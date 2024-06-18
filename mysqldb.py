@@ -1,9 +1,9 @@
-'''
+"""
 
 pip install mysql-connector-python
 
 
-'''
+"""
 
 import mysql.connector
 import pandas as pd
@@ -20,7 +20,7 @@ mysql_config = {
 
 
 # Define functions
-def check_nulls(schema_name):
+def mysql_check_nulls(schema_name):
     conn = mysql.connector.connect(**mysql_config)
     cursor = conn.cursor()
 
@@ -54,7 +54,7 @@ def check_nulls(schema_name):
     return null_counts_df
 
 
-def check_nulls_table(schema_name, table_name, column_name):
+def mysql_check_nulls_table(schema_name, table_name, column_name):
     conn = mysql.connector.connect(**mysql_config)
     cursor = conn.cursor()
 
@@ -80,7 +80,7 @@ def check_nulls_table(schema_name, table_name, column_name):
     return df
 
 
-def find_duplicates(schema_name, table_name, column_name):
+def mysql_find_duplicates(schema_name, table_name, column_name):
     conn = mysql.connector.connect(**mysql_config)
     cursor = conn.cursor()
 
@@ -109,7 +109,7 @@ def find_duplicates(schema_name, table_name, column_name):
     return results
 
 
-def full_data_validation(excel_file):
+def mysql_full_data_validation(excel_file):
     conn = mysql.connector.connect(**mysql_config)
     cursor = conn.cursor()
 

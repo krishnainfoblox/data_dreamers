@@ -39,7 +39,7 @@ properties = {
 
 
 # Define functions
-def check_nulls(schema_name):
+def aws_check_nulls(schema_name):
     spark = SparkSession.builder.getOrCreate()
 
     # Get list of all tables
@@ -68,7 +68,8 @@ def check_nulls(schema_name):
 
     return null_counts_df
 
-def check_nulls_table(schema_name, table_name, column_name):
+
+def aws_check_nulls_table(schema_name, table_name, column_name):
     null_count_query = f'SELECT COUNT(*) as null_count FROM "{schema_name}"."{table_name}" WHERE "{column_name}" IS NULL'
     null_count_df = sparkrs.read.jdbc(url=jdbc_url, table=f"({null_count_query}) AS tmp", properties=properties)
     null_count = null_count_df.first()['null_count']
@@ -87,7 +88,8 @@ def check_nulls_table(schema_name, table_name, column_name):
 
     return df
 
-def find_duplicates(schema_name, table_name, column_name):
+
+def aws_find_duplicates(schema_name, table_name, column_name):
     query = f"SELECT {column_name}, COUNT(*) c FROM {schema_name}.{table_name} GROUP BY {column_name} HAVING c > 1"
     df = sparkrs.read.jdbc(url=jdbc_url, table=f"({query}) AS tmp", properties=properties)
 
@@ -108,7 +110,8 @@ def find_duplicates(schema_name, table_name, column_name):
 
     return results
 
-def full_data_validation(excel_file):
+
+def aws_full_data_validation(excel_file):
     spark = SparkSession.builder.getOrCreate()
 
     df1 = pd.read_excel(excel_file, sheet_name='Sheet1')
@@ -164,7 +167,3 @@ def full_data_validation(excel_file):
             all_results.append(results)
 
     return pd.concat(all_results)
-
-
-
-
