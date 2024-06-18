@@ -38,9 +38,6 @@ properties = {
 }
 
 
-
-
-
 # Define functions
 def check_nulls(schema_name):
     spark = SparkSession.builder.getOrCreate()
@@ -167,3 +164,7 @@ def full_data_validation(excel_file):
             all_results.append(results)
 
     return pd.concat(all_results)
+
+
+
+
