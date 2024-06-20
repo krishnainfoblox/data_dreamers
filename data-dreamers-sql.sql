@@ -82,6 +82,7 @@ select * from org.salgrade;
 select * from org.bonus;
 
 #################################
+rollback;
 
 truncate table org.employee;
 truncate table org.department;

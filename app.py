@@ -1,4 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+"""
+CODER - KRISHNA
+INFOBLOX 2024 - HACKATHON/HACK FEST
+
+-----------------------------------
+---- LIBRARIES TO USE ----
+-----------------------------------
+# pip install pyspark
+# pip install pandas
+# pip install openpyxl
+# pip install datetime
+# pip install pandas openpyxl psycopg2-binary
+# pip install flask
+# pip install
+# pip install XlsxWriter
+# pip install pandas openpyxl xlrd
+# pip install mysql-connector-python
+
+"""
+
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import pandas as pd
 import time
 import os
@@ -74,14 +94,12 @@ def aws_duplicate_validation_view():
 
 
 @app.route('/004_AWS_full-data-validation', methods=['GET', 'POST'])
-def aws_full_data_validation_view():
+def aws_full_data():
     result = None
     elapsed_time = None
     if request.method == 'POST':
-        excel_file = request.files['excel_file']
         start_time = time.time()
-        data = aws_full_data_validation(excel_file)
-        result = data.to_html(classes='table table-striped')
+        aws_full_data_validation()
         elapsed_time = time.time() - start_time
     return render_template('004_AWS_full_data_validation.html', result=result, elapsed_time=elapsed_time)
 

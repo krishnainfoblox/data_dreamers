@@ -27,11 +27,6 @@ window.onload = function() {
     updateTime();
     setInterval(updateTime, 1000);
 
-    var form = document.querySelector('form');
-    form.addEventListener('submit', function() {
-        startStopwatch();
-    });
-
     if (document.querySelector('.result')) {
         resultDisplayed = true;
         stopStopwatch();

@@ -8,27 +8,63 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script>
-        var startTime = {{ start_time }};
+        var resultDisplayed = {{ 'true' if result else 'false' }};
     </script>
 </head>
-
 
 <body>
     <div class="container">
         <h1>AWS FULL DATA VALIDATION</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <label for="excel_file">Upload Excel File:</label>
-            <input type="file" id="excel_file" name="excel_file" required>
-            <button type="submit">Validate</button>
-        </form>
-        {% if result %}
-        <div class="result">
+        <button id="startButton" onclick="startValidation()">Start Validation</button>
+         <div class="TIME">
+                <p>System Time: <span id="system_time"></span></p>
+            </div>
+        <div id="result" class="result" style="visibility:hidden;">
             <h2>Result:</h2>
-            {{ result|safe }}
-            <p>Elapsed Time: <span id="elapsed_time"></span></p>
-            <p>System Time: <span id="system_time"></span></p>
+            <p>Validation successfully completed.</p>
+            <div class="TIME">
+                <p>Elapsed Time: <span id="elapsed_time"></span></p>
+            </div>
         </div>
-        {% endif %}
     </div>
+    <script>
+        function startValidation() {
+            startStopwatch();
+            fetch('/004_AWS_full-data-validation', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    stopStopwatch();
+                    document.getElementById("result").style.visibility = "visible";
+                    updateTime(); // Update system time when results are displayed
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        window.onload = function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+    </script>
+    <style>
+        .result {
+            margin-top: 20px;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+    </style>
 </body>
+
 </html>
