@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Validation Result</h1>
+        <table>
+            <tr>
+                <th>Schema Name 1</th>
+                <th>Table Name 1</th>
+                <th>Schema Name 2</th>
+                <th>Table Name 2</th>
+                <th>A-B</th>
+                <th>B-A</th>
+                <th>A-B Count Minus</th>
+                <th>B-A Count Minus</th>
+                <th>Run Date</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.schema_name1 }}</td>
+                <td>{{ result.table_name1 }}</td>
+                <td>{{ result.schema_name2 }}</td>
+                <td>{{ result.table_name2 }}</td>
+                <td>{{ result.a_b }}</td>
+                <td>{{ result.b_a }}</td>
+                <td>{{ result.a_b_count_minus }}</td>
+                <td>{{ result.b_a_count_minus }}</td>
+                <td>{{ result.run_date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
