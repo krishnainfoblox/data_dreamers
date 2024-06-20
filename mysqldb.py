@@ -279,4 +279,3 @@ def mysql_full_data_validation():
     return ('success')
 
 
-mysql_full_data_validation()
