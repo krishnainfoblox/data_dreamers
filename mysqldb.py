@@ -110,72 +110,112 @@ def mysql_find_duplicates(schema_name, table_name, column_name):
     return results
 
 
-def mysql_null_validation_table(schema_name, table_name):
+# Function to get columns from a table
+def get_columns(schema_name, table_name):
     conn = mysql.connector.connect(**mysql_config)
     cursor = conn.cursor()
+    column_query = f"SELECT column_name FROM information_schema.columns WHERE table_schema = '{schema_name}' AND table_name = '{table_name}'"
+    cursor.execute(column_query)
+    columns = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    return columns
 
-    try:
-        # Get list of columns for the specified table
-        column_query = f"SELECT column_name FROM information_schema.columns WHERE table_schema = '{schema_name}' AND table_name = '{table_name}'"
-        cursor.execute(column_query)
-        columns = [row[0] for row in cursor.fetchall()]
 
-        null_counts = []
+# Function for null check
+def null_check_from_excel(df1):
+    df_results = pd.DataFrame()
 
-        # Iterate over each column and count nulls
+    for index, row in df1.iterrows():
+        schema_name = row['schema_name']
+        table_name = row['table_name']
+        columns = get_columns(schema_name, table_name)
+
         for column_name in columns:
-            null_count_query = f"SELECT COUNT(*) as null_count FROM `{schema_name}`.`{table_name}` WHERE `{column_name}` IS NULL"
+            conn = mysql.connector.connect(**mysql_config)
+            cursor = conn.cursor()
+            null_count_query = f'SELECT COUNT(*) as null_count FROM `{schema_name}`.`{table_name}` WHERE `{column_name}` IS NULL'
             cursor.execute(null_count_query)
             null_count = cursor.fetchone()[0]
             null_check = "FAIL" if null_count > 0 else "PASS"
             run_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-            # Append result to null_counts list
-            null_counts.append({
-                "schema_name": schema_name,
-                "table_name": table_name,
-                "column_name": column_name,
-                "null_check": null_check,
-                "number_of_nulls": null_count,
-                "run_date": run_date
+            df = pd.DataFrame({
+                "schema_name": [schema_name],
+                "table_name": [table_name],
+                "column_name": [column_name],
+                "null_check": [null_check],
+                "number_of_nulls": [null_count],
+                "run_date": [run_date]
             })
+            df_results = pd.concat([df_results, df])
+            cursor.close()
+            conn.close()
 
-        # Close cursor and connection
+    return df_results
+
+
+# Function for duplicate check
+def find_duplicates(df1):
+    results = pd.DataFrame()
+
+    for index, row in df1.iterrows():
+        schema_name = row['schema_name']
+        table_name = row['table_name']
+        key_column = row['key_column']
+        conn = mysql.connector.connect(**mysql_config)
+        cursor = conn.cursor()
+        query = f"SELECT `{key_column}`, COUNT(*) c FROM `{schema_name}`.`{table_name}` GROUP BY `{key_column}` HAVING c > 1"
+        cursor.execute(query)
+        duplicates = cursor.fetchall()
+
+        if len(duplicates) == 0:
+            duplicate_check = 'PASS'
+            number_of_duplicates = 0
+        else:
+            duplicate_check = 'FAIL'
+            number_of_duplicates = sum(row[1] for row in duplicates)
+
+        result = pd.DataFrame({
+            'schema_name': [schema_name],
+            'key_column': [key_column],
+            'duplicate_check': [duplicate_check],
+            'number_of_duplicates': [number_of_duplicates],
+            'run_date': [datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
+        })
+        results = pd.concat([results, result])
         cursor.close()
         conn.close()
 
-        # Convert list of dictionaries to DataFrame
-        null_counts_df = pd.DataFrame(null_counts)
-
-        return null_counts_df
-
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        return pd.DataFrame()
+    return results
 
 
-def mysql_data_validation(s_schema_name, s_tb_name, s_col_name, t_schema_name, t_tb_name, t_col_name):
-    conn = mysql.connector.connect(**mysql_config)
-    cursor = conn.cursor()
+# Function for data validation
+def data_validation(df):
+    results = pd.DataFrame()
 
-    try:
-        # Construct queries for source and target tables
-        query1 = f"SELECT {', '.join(s_col_name)} FROM {s_schema_name}.{s_tb_name}"
-        query2 = f"SELECT {', '.join(t_col_name)} FROM {t_schema_name}.{t_tb_name}"
+    for index, row in df.iterrows():
+        s_schema_name = row['s_schema_name']
+        s_tb_name = row['s_tb_name']
+        s_col_name = row['s_col_name'].split(',')
+        t_schema_name = row['t_schema_name']
+        t_tb_name = row['t_tb_name']
+        t_col_name = row['t_col_name'].split(',')
+        source = f"`{s_schema_name}`.`{s_tb_name}`"
+        target = f"`{t_schema_name}`.`{t_tb_name}`"
 
-        # Execute queries
+        conn = mysql.connector.connect(**mysql_config)
+        cursor = conn.cursor()
+
+        query1 = f"SELECT {', '.join([f'`{col}`' for col in s_col_name])} FROM {source}"
+        query2 = f"SELECT {', '.join([f'`{col}`' for col in t_col_name])} FROM {target}"
+
         cursor.execute(query1)
-        result1 = cursor.fetchall()
+        df1 = pd.DataFrame(cursor.fetchall(), columns=s_col_name)
         cursor.execute(query2)
-        result2 = cursor.fetchall()
+        df2 = pd.DataFrame(cursor.fetchall(), columns=t_col_name)
 
-        # Convert results to DataFrames
-        df1 = pd.DataFrame(result1, columns=s_col_name)
-        df2 = pd.DataFrame(result2, columns=t_col_name)
-
-        # Perform data validation
-        result1_diff = df1[~df1.isin(df2)].dropna()
-        result2_diff = df2[~df2.isin(df1)].dropna()
+        result1_diff = df1[~df1.isin(df2).all(axis=1)]
+        result2_diff = df2[~df2.isin(df1).all(axis=1)]
 
         a_b_count_minus = len(result1_diff)
         b_a_count_minus = len(result2_diff)
@@ -185,10 +225,9 @@ def mysql_data_validation(s_schema_name, s_tb_name, s_col_name, t_schema_name, t
 
         diff_columns = ', '.join(result1_diff.columns.tolist())
 
-        # Prepare result DataFrame
-        results = pd.DataFrame({
-            'source': [f"{s_schema_name}.{s_tb_name}"],
-            'target': [f"{t_schema_name}.{t_tb_name}"],
+        result = pd.DataFrame({
+            'source': [source],
+            'target': [target],
             'a-b': [a_b_count_minus],
             'a-b-result': [a_b],
             'b-a': [b_a_count_minus],
@@ -196,86 +235,34 @@ def mysql_data_validation(s_schema_name, s_tb_name, s_col_name, t_schema_name, t
             'diff_columns': [diff_columns],
             'run_date': [datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
         })
+        results = pd.concat([results, result])
 
-        return results
-
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        return pd.DataFrame()
-
-    finally:
-        # Close cursor and connection
         cursor.close()
         conn.close()
+
+    return results
 
 
 def mysql_full_data_validation():
     excel_file = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/code-hackathon-2024/_raw/mysql_validationcheck.xlsx"
     result_file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/code-hackathon-2024/result/mysql_full_data_validation_results.xlsx"
 
-    # Read Excel file containing sheets for null validation, primary key check, and data validation
-    df = pd.read_excel(excel_file, sheet_name=None)
+    # Read each sheet into a DataFrame
+    df_null_check = pd.read_excel(excel_file, sheet_name='Sheet1')
+    df_duplicate_check = pd.read_excel(excel_file, sheet_name='Sheet2')
+    df_data_validation = pd.read_excel(excel_file, sheet_name='Sheet3')
 
-    results = []
+    # Perform the validations
+    null_check_results = null_check_from_excel(df_null_check)
+    duplicate_check_results = find_duplicates(df_duplicate_check)
+    data_validation_results = data_validation(df_data_validation)
 
-    # Null Validation
-    if 'Sheet1' in df:
-        null_df = df['Sheet1']
-        for index, row in null_df.iterrows():
-            schema_name = row['schema_name']
-            table_name = row['table_name']
+    # Write the results to a single Excel file with different sheets
+    with pd.ExcelWriter(result_file_path, engine='openpyxl') as writer:
+        null_check_results.to_excel(writer, sheet_name='Null Check Results', index=False)
+        duplicate_check_results.to_excel(writer, sheet_name='Duplicate Check Results', index=False)
+        data_validation_results.to_excel(writer, sheet_name='Data Validation Results', index=False)
 
-            result = mysql_null_validation_table(schema_name, table_name)
-            results.append(result)
-
-    # Primary Key Check
-    if 'Sheet2' in df:
-        duplicate_df = df['Sheet2']
-        for index, row in duplicate_df.iterrows():
-            schema_name = row['schema_name']
-            table_name = row['table_name']
-            key_column = row['key_column']
-
-            duplicates = mysql_find_duplicates(schema_name, table_name, key_column)
-
-            results.append(result)
-
-    # Data Validation
-    if 'Sheet3' in df:
-        data_validation_df = df['Sheet3']
-        for index, row in data_validation_df.iterrows():
-            s_schema_name = row['s_schema_name']
-            s_tb_name = row['s_tb_name']
-            s_col_name = row['s_col_name'].split(',')
-            t_schema_name = row['t_schema_name']
-            t_tb_name = row['t_tb_name']
-            t_col_name = row['t_col_name'].split(',')
-
-            a_b, a_b_count_minus, b_a_count_minus, diff_columns = mysql_data_validation(
-                s_schema_name, s_tb_name, s_col_name, t_schema_name, t_tb_name, t_col_name
-            )
-
-            result = {
-                'Validation Type': 'Data Validation',
-                'Source': f"{s_schema_name}.{s_tb_name}",
-                'Target': f"{t_schema_name}.{t_tb_name}",
-                'A - B Count': a_b_count_minus,
-                'A - B Result': a_b,
-                'B - A Count': b_a_count_minus,
-                'Diff Columns': diff_columns,
-                'Run Date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
-            results.append(result)
-
-    # Convert results to DataFrame
-    results_df = pd.DataFrame(results)
-
-    # Write results to an Excel file with multiple sheets
-    result_file_path = "/path/to/save/mysql_full_data_validation_results.xlsx"
-    with pd.ExcelWriter(result_file_path, engine='xlsxwriter') as writer:
-        for validation_type, group in results_df.groupby('Validation Type'):
-            group.to_excel(writer, sheet_name=validation_type, index=False)
-
-    return ('success')
+    return 'success'
 
 

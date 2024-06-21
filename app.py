@@ -154,10 +154,8 @@ def mysql_full_data_validation_view():
     result = None
     elapsed_time = None
     if request.method == 'POST':
-        excel_file = request.files['excel_file']
         start_time = time.time()
-        data = mysql_full_data_validation(excel_file)
-        result = data.to_html(classes='table table-striped')
+        mysql_full_data_validation()
         elapsed_time = time.time() - start_time
     return render_template('004_MySQL_full_data_validation.html', result=result, elapsed_time=elapsed_time)
 

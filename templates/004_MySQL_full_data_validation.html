@@ -30,7 +30,7 @@
     <script>
         function startValidation() {
             startStopwatch();
-            fetch('/004_AWS_full-data-validation', { method: 'POST' })
+            fetch('/004_MYSQL_full-data-validation', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     stopStopwatch();
