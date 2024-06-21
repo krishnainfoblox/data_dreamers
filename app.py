@@ -19,6 +19,7 @@ INFOBLOX 2024 - HACKATHON/HACK FEST
 
 
 """
+import subprocess
 
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import pandas as pd
@@ -28,8 +29,12 @@ from awsrs import aws_check_nulls, aws_check_nulls_table, aws_find_duplicates, a
 from mysqldb import mysql_check_nulls, mysql_check_nulls_table, mysql_find_duplicates, mysql_full_data_validation
 from filevalidation import read_csv, read_json, read_parquet, comparedf
 
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
+
+UPLOAD_FOLDER = 'uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route('/')
@@ -49,7 +54,7 @@ def mysql_home():
 
 @app.route('/file')
 def file_home():
-    return render_template('file_validation.html')
+    return render_template('validate_files.html')
 
 
 @app.route('/001_AWS_null-validation-full-schema', methods=['GET', 'POST'])
@@ -160,23 +165,22 @@ def mysql_full_data_validation_view():
     return render_template('004_MySQL_full_data_validation.html', result=result, elapsed_time=elapsed_time)
 
 
-@app.route('/file_001_csv_csv', methods=['GET', 'POST'])
-def file_csv_csv_view():
-    result = None
-    elapsed_time = None
-
+@app.route('/file-validation', methods=['GET', 'POST'])
+def file_validation_route():
     if request.method == 'POST':
+        # Check if the POST request has the file part
         if 'file1' not in request.files or 'file2' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+            return "No file part in the request"
 
         file1 = request.files['file1']
         file2 = request.files['file2']
+        file1_type = request.form['file1_type']
+        file2_type = request.form['file2_type']
         primary_key = request.form['primary_key']
 
+        # If user does not select file, browser also submits an empty part without filename
         if file1.filename == '' or file2.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            return "No selected file"
 
         file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
         file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
@@ -184,158 +188,13 @@ def file_csv_csv_view():
         file1.save(file1_path)
         file2.save(file2_path)
 
-        start_time = time.time()
-        df1 = read_csv(file1_path)
-        df2 = read_csv(file2_path)
-        result = comparedf(df1, df2, primary_key)
-        elapsed_time = time.time() - start_time
+        # Trigger the PySpark script
+        subprocess.run(['python3', 'filevalidation.py', file1_path, file1_type, file2_path, file2_type, primary_key])
 
-    return render_template('file_001_csv_csv.html', result=result, elapsed_time=elapsed_time)
+        return "Validation completed. Check the results."
 
-
-@app.route('/file_002_csv_json', methods=['GET', 'POST'])
-def file_csv_json_view():
-    result = None
-    elapsed_time = None
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        file2 = request.files['file2']
-        primary_key = request.form['primary_key']
-
-        if file1 and file2:
-            file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
-            file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
-            file1.save(file1_path)
-            file2.save(file2_path)
-
-            srcdf = read_csv(file1_path)
-            tgtdf = read_json(file2_path)
-
-            result_df = comparedf(srcdf, tgtdf, primary_key)
-            result = result_df.to_html(classes='table table-striped')
-
-            os.remove(file1_path)
-            os.remove(file2_path)
-
-            elapsed_time = time.time() - start_time
-
-    return render_template('file_002_csv_json.html', result=result, elapsed_time=elapsed_time)
-
-
-@app.route('/file_003_csv_parquet', methods=['GET', 'POST'])
-def file_csv_parquet_view():
-    result = None
-    elapsed_time = None
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        file2 = request.files['file2']
-        primary_key = request.form['primary_key']
-
-        if file1 and file2:
-            file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
-            file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
-            file1.save(file1_path)
-            file2.save(file2_path)
-
-            srcdf = read_csv(file1_path)
-            tgtdf = read_parquet(file2_path)
-
-            result_df = comparedf(srcdf, tgtdf, primary_key)
-            result = result_df.to_html(classes='table table-striped')
-
-            os.remove(file1_path)
-            os.remove(file2_path)
-
-            elapsed_time = time.time() - start_time
-
-    return render_template('file_003_csv_parquet.html', result=result, elapsed_time=elapsed_time)
-
-
-@app.route('/file_004_json_json', methods=['GET', 'POST'])
-def file_json_json_view():
-    result = None
-    elapsed_time = None
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        file2 = request.files['file2']
-        primary_key = request.form['primary_key']
-
-        if file1 and file2:
-            file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
-            file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
-            file1.save(file1_path)
-            file2.save(file2_path)
-
-            srcdf = read_json(file1_path)
-            tgtdf = read_json(file2_path)
-
-            result_df = comparedf(srcdf, tgtdf, primary_key)
-            result = result_df.to_html(classes='table table-striped')
-
-            os.remove(file1_path)
-            os.remove(file2_path)
-
-            elapsed_time = time.time() - start_time
-
-    return render_template('file_004_json_json.html', result=result, elapsed_time=elapsed_time)
-
-
-@app.route('/file_005_json_parquet', methods=['GET', 'POST'])
-def file_json_parquet_view():
-    result = None
-    elapsed_time = None
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        file2 = request.files['file2']
-        primary_key = request.form['primary_key']
-
-        if file1 and file2:
-            file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
-            file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
-            file1.save(file1_path)
-            file2.save(file2_path)
-
-            srcdf = read_json(file1_path)
-            tgtdf = read_parquet(file2_path)
-
-            result_df = comparedf(srcdf, tgtdf, primary_key)
-            result = result_df.to_html(classes='table table-striped')
-
-            os.remove(file1_path)
-            os.remove(file2_path)
-
-            elapsed_time = time.time() - start_time
-
-    return render_template('file_005_json_parquet.html', result=result, elapsed_time=elapsed_time)
-
-
-@app.route('/file_006_parquet_parquet', methods=['GET', 'POST'])
-def file_parquet_parquet_view():
-    result = None
-    elapsed_time = None
-    if request.method == 'POST':
-        file1 = request.files['file1']
-        file2 = request.files['file2']
-        primary_key = request.form['primary_key']
-
-        if file1 and file2:
-            file1_path = os.path.join(app.config['UPLOAD_FOLDER'], file1.filename)
-            file2_path = os.path.join(app.config['UPLOAD_FOLDER'], file2.filename)
-            file1.save(file1_path)
-            file2.save(file2_path)
-
-            srcdf = read_parquet(file1_path)
-            tgtdf = read_parquet(file2_path)
-
-            result_df = comparedf(srcdf, tgtdf, primary_key)
-            result = result_df.to_html(classes='table table-striped')
-
-            os.remove(file1_path)
-            os.remove(file2_path)
-
-            elapsed_time = time.time() - start_time
-
-    return render_template('file_006_parquet_parquet.html', result=result, elapsed_time=elapsed_time)
+    # If method is GET, render the form
+    return render_template('validate_files.html')
 
 
 if __name__ == '__main__':

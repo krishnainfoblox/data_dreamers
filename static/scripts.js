@@ -32,3 +32,33 @@ window.onload = function() {
         stopStopwatch();
     }
 };
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const systemTimeElement = document.getElementById('systemTime');
+    const elapsedTimeElement = document.getElementById('elapsedTime');
+    const validationForm = document.getElementById('validationForm');
+    const resultDisplay = document.getElementById('resultDisplay');
+
+    function updateSystemTime() {
+        const now = new Date();
+        systemTimeElement.textContent = now.toLocaleTimeString();
+    }
+
+    function showElapsedTime(startTime) {
+        const endTime = new Date();
+        const elapsedTime = (endTime - startTime) / 1000; // elapsed time in seconds
+        elapsedTimeElement.textContent = elapsedTime + ' seconds';
+    }
+
+    // Update system time every second
+    setInterval(updateSystemTime, 1000);
+
+    validationForm.addEventListener('submit', function(event) {
+        const startTime = new Date();
+        elapsedTimeElement.textContent = 'Calculating...';
+        resultDisplay.textContent = 'Processing...';
+
+        // You can remove event.preventDefault() to allow the form to submit and trigger the Flask route
+    });
+});

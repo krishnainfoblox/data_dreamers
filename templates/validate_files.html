@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File to File Validation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <style>
+        .form-group {
+            margin-top: 10px; /* Adjust margin as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File to File Validation</h1>
+        <form id="validationForm" action="/file-validation" method="post" enctype="multipart/form-data">
+            <label for="file1">Select File 1:</label>
+            <input type="file" id="file1" name="file1" required>
+
+            <label for="file1_type">Select File 1 Type:</label>
+            <select id="file1_type" name="file1_type" required>
+                <option value="CSV">CSV</option>
+                <option value="JSON">JSON</option>
+                <option value="PARQUET">PARQUET</option>
+            </select>
+
+            <label for="file2">Select File 2:</label>
+            <input type="file" id="file2" name="file2" required>
+
+            <label for="file2_type">Select File 2 Type:</label>
+            <select id="file2_type" name="file2_type" required>
+                <option value="CSV">CSV</option>
+                <option value="JSON">JSON</option>
+                <option value="PARQUET">PARQUET</option>
+            </select>
+
+            <div class="form-group">
+                <label for="primary_key">Primary Key:</label>
+                <input type="text" id="primary_key" name="primary_key" required>
+            </div>
+
+            <button type="submit">Validate Files</button>
+        </form>
+        <div id="timeDisplay">
+            <p>System Time: <span id="systemTime"></span></p>
+            <p>Elapsed Time: <span id="elapsedTime"></span></p>
+        </div>
+        <div id="resultDisplay">
+            <!-- Validation results will be shown here -->
+        </div>
+    </div>
+</body>
+</html>
