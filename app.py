@@ -25,6 +25,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 import pandas as pd
 import time
 import os
+import subprocess
 from awsrs import aws_check_nulls, aws_check_nulls_table, aws_find_duplicates, aws_full_data_validation
 from mysqldb import mysql_check_nulls, mysql_check_nulls_table, mysql_find_duplicates, mysql_full_data_validation
 from filevalidation import read_csv, read_json, read_parquet, comparedf
@@ -51,6 +52,12 @@ def aws_home():
 def mysql_home():
     return render_template('mysql.html')
 
+frontend_path = '/Users/rshukla/Documents/Projects/infoblox/finaldatadreamers/data_dreamers/frontend'
+backend_path = '/Users/rshukla/Documents/Projects/infoblox/finaldatadreamers/data_dreamers/backend'
+
+@app.route('/bi-performance-testing')
+def bi_performance():
+    return redirect('http://localhost:5173/')
 
 @app.route('/file')
 def file_home():
