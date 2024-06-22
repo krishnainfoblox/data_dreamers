@@ -42,10 +42,10 @@ start_servers_in_background() {
 
 # Choose how to start servers (uncomment one option)
 # start_servers_in_terminals  # Uncomment to start servers in separate terminals
-# start_servers_in_background # Uncomment to start servers in the background
+start_servers_in_background # Uncomment to start servers in the background
 
 # Wait for both servers to start (adjust time as needed)
-sleep 10
+sleep 7
 
 # Start Flask application
 python3 app.py

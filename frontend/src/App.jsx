@@ -50,10 +50,10 @@ function App() {
       <button onClick={handleSubmit} disabled={loading}>
         {loading ? 'Testing...' : 'Run Performance Test'}
       </button><br /><br />
-      <div className="tooltip">
+      <center><div className="tooltip">
         <span className="tooltip-text">{result && 'Hover over metrics for details'}</span>
         <h2>Performance Metrics</h2><br /><br />
-      </div>
+      </div></center>
       {result && (
         <div>
           <ul>
