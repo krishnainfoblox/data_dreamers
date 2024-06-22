@@ -16,6 +16,10 @@ INFOBLOX 2024 - HACKATHON/HACK FEST
 # pip install pandas openpyxl xlrd
 # pip install mysql-connector-python
 
+# brew install node
+
+OPEN CHROME in debugging mode -
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
 
 
 """
@@ -52,8 +56,8 @@ def aws_home():
 def mysql_home():
     return render_template('mysql.html')
 
-frontend_path = '/Users/rshukla/Documents/Projects/infoblox/finaldatadreamers/data_dreamers/frontend'
-backend_path = '/Users/rshukla/Documents/Projects/infoblox/finaldatadreamers/data_dreamers/backend'
+frontend_path = '/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/frontend'
+backend_path = '/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/backend'
 
 @app.route('/bi-performance-testing')
 def bi_performance():

@@ -10,6 +10,20 @@ is_process_running() {
     pgrep -x "$1" > /dev/null
 }
 
+# Function to kill processes by port
+kill_process_on_port() {
+    PORT=$1
+    PID=$(lsof -t -i:$PORT)
+    if [[ -n "$PID" ]]; then
+        kill -9 $PID
+        echo "Killed process $PID on port $PORT"
+    fi
+}
+
+# Kill processes using conflicting ports
+kill_process_on_port 3001
+kill_process_on_port 5173
+
 # Start React development server function
 start_react_server() {
     cd frontend
@@ -46,6 +60,12 @@ start_servers_in_background # Uncomment to start servers in the background
 
 # Wait for both servers to start (adjust time as needed)
 sleep 7
+
+# Activate virtual environment (adjust the path to your virtual environment)
+# source /path/to/your/venv/bin/activate
+
+# Ensure Flask is installed
+pip install flask
 
 # Start Flask application
 python3 app.py

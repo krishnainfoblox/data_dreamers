@@ -244,8 +244,8 @@ def data_validation(df):
 
 
 def mysql_full_data_validation():
-    excel_file = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/code-hackathon-2024/_raw/mysql_validationcheck.xlsx"
-    result_file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/code-hackathon-2024/result/mysql_full_data_validation_results.xlsx"
+    excel_file = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/_raw/mysql_validationcheck.xlsx"
+    result_file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/RESULT/mysql_full_data_validation_results.xlsx"
 
     # Read each sheet into a DataFrame
     df_null_check = pd.read_excel(excel_file, sheet_name='Sheet1')

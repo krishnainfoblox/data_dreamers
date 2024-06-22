@@ -1,0 +1,3 @@
+#!/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/myenv/bin/python3.12
+from spark import spark_admin
+spark_admin.main()
