@@ -42,23 +42,34 @@ start_express_server() {
     cd ..
 }
 
+# Start bi_backend server function
+start_bi_backend_server() {
+    cd bi_backend
+    npm install
+    node server.js &
+    BI_BACKEND_PID=$!
+    cd ..
+}
+
 # Option 1: Start servers in separate terminals (MacOS specific)
 start_servers_in_terminals() {
     run_in_terminal "cd frontend && npm install && npm run dev"
     run_in_terminal "cd backend && npm install && node server.js"
+    run_in_terminal "cd bi_backend && npm install && node server.js"
 }
 
 # Option 2: Start servers in the background
 start_servers_in_background() {
     start_react_server
     start_express_server
+    start_bi_backend_server
 }
 
 # Choose how to start servers (uncomment one option)
 # start_servers_in_terminals  # Uncomment to start servers in separate terminals
 start_servers_in_background # Uncomment to start servers in the background
 
-# Wait for both servers to start (adjust time as needed)
+# Wait for all servers to start (adjust time as needed)
 sleep 7
 
 # Activate virtual environment (adjust the path to your virtual environment)
@@ -77,4 +88,8 @@ fi
 
 if [[ -n $EXPRESS_PID ]]; then
     kill $EXPRESS_PID
+fi
+
+if [[ -n $BI_BACKEND_PID ]]; then
+    kill $BI_BACKEND_PID
 fi

@@ -63,6 +63,10 @@ backend_path = '/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackth
 def bi_performance():
     return redirect('http://localhost:5173/')
 
+@app.route('/bi-Validation-download')
+def download_crosstab():
+    return render_template('bi_download_crosstab.html')
+
 @app.route('/file')
 def file_home():
     return render_template('validate_files.html')
