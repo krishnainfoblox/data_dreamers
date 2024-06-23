@@ -28,29 +28,34 @@ const ensureDirectoryExistence = (filePath) => {
 
 // Function to extract data from Tableau
 const extractDataFromTableau = async (dashboardUrl) => {
-  const browser = await chromium.connectOverCDP('http://localhost:9222');
-  const context = browser.contexts()[0];
-  const page = await context.newPage();
-
-  try {
-    await page.goto(dashboardUrl);
-    await page.waitForResponse(response => response.url().includes('runtimeanimweb.wasm'), { timeout: 300000 });
-
-
-    const dashboardName = dashboardUrl.split('/').pop();
-    const dashboardPath = path.join(resultBasePath, dashboardName);
-    ensureDirectoryExistence(dashboardPath);
-
-    const tabs = await page.$$('.tab');
-    for (const [tabIndex, tab] of tabs.entries()) {
-      await tab.click();
+    const browser = await chromium.connectOverCDP('http://localhost:9222');
+    const context = browser.contexts()[0];
+    const page = await context.newPage();
+  
+    try {
+      await page.goto(dashboardUrl);
+      await page.waitForResponse(response => response.url().includes('runtimeanimweb.wasm'), { timeout: 300000 });
+  
+      // Increase timeout for waitForSelector
+      await page.waitForSelector('button[id="download"]', { timeout: 60000 });
+      await page.click('button[id="download"]');
       await page.waitForTimeout(1000);
-
-      const crosstabs = await page.$$('.tabToolbarButtonCrosstab');
-      for (const [crossTabIndex, crosstab] of crosstabs.entries()) {
-        await crosstab.click();
+  
+      await page.waitForSelector('div[id="viz-viewer-toolbar-download-menu"]', { timeout: 60000 });
+      await page.waitForTimeout(1000);
+  
+      const downloadOptions = await page.$$('div[data-tb-test-id^="download-flyout-download-crosstab"]');
+      for (const downloadOption of downloadOptions) {
+        await downloadOption.click();
         await page.waitForTimeout(1000);
-
+  
+        const sheetThumbnail = await page.waitForSelector('div[aria-selected="true"][data-tb-test-id^="sheet-thumbnail"]', { timeout: 60000 });
+        const itemIndex = await sheetThumbnail.getAttribute('data-itemindex');
+  
+        const exportButton = await page.waitForSelector('button[data-tb-test-id="export-crosstab-export-Button"]', { timeout: 60000 });
+        await exportButton.click();
+        await page.waitForTimeout(1000);
+  
         const data = await page.evaluate(() => {
           const rows = Array.from(document.querySelectorAll('.tabCrosstab .tabTable > tbody > tr'));
           return rows.map(row => {
@@ -58,18 +63,22 @@ const extractDataFromTableau = async (dashboardUrl) => {
             return Array.from(cells).map(cell => cell.innerText);
           });
         });
-
+  
         const csvContent = data.map(row => row.join(',')).join('\n');
-        const fileName = `tab${tabIndex + 1}-crosstab${crossTabIndex + 1}.csv`;
+        const fileName = `crosstab-sheet${itemIndex}.csv`;
+        const dashboardName = dashboardUrl.split('/').pop();
+        const dashboardPath = path.join(resultBasePath, dashboardName);
+        ensureDirectoryExistence(dashboardPath);
         fs.writeFileSync(path.join(dashboardPath, fileName), csvContent);
       }
+    } catch (error) {
+      console.error('Error extracting data:', error);
+    } finally {
+      await page.close();
     }
-  } catch (error) {
-    console.error('Error extracting data:', error);
-  } finally {
-    await page.close();
-  }
-};
+  };
+  
+  
 
 app.post('/extract', async (req, res) => {
   const { url } = req.body;
