@@ -61,6 +61,21 @@ def download_crosstab():
     return render_template('bi_download_crosstab.html')
 
 
+@app.route('/bi_isolation_dashboard')
+def data_quality():
+    # Load results
+    df = pd.read_csv('/Users/rshukla/Documents/Projects/infoblox/finaldatadreamers/data_dreamers/AI/results.csv')
+
+    # Extract anomalies
+    anomalies = df[df['anomaly'] == -1]
+
+    # Convert to dictionaries for rendering
+    results_dict = df.to_dict(orient='records')
+    anomalies_dict = anomalies.to_dict(orient='records')
+
+    return render_template('bi_isolation_dashboard.html', results=results_dict, anomalies=anomalies_dict)
+
+
 @app.route('/file')
 def file_home():
     return render_template('validate_files.html')

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anomaly Detection Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Anomaly Detection Results</h1>
+
+        <h2>All Records</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Feature 1</th>
+                    <th>Feature 2</th>
+                    <th>Feature 3</th>
+                    <th>Anomaly Score</th>
+                    <th>Anomaly</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in results %}
+                <tr {% if record.anomaly == -1 %} class="table-danger" {% endif %}>
+                    <td>{{ record.feature1 }}</td>
+                    <td>{{ record.feature2 }}</td>
+                    <td>{{ record.feature3 }}</td>
+                    <td>{{ record.anomaly_score }}</td>
+                    <td>{{ record.anomaly }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Anomalies</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Feature 1</th>
+                    <th>Feature 2</th>
+                    <th>Feature 3</th>
+                    <th>Anomaly Score</th>
+                    <th>Anomaly</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for anomaly in anomalies %}
+                <tr class="table-danger">
+                    <td>{{ anomaly.feature1 }}</td>
+                    <td>{{ anomaly.feature2 }}</td>
+                    <td>{{ anomaly.feature3 }}</td>
+                    <td>{{ anomaly.anomaly_score }}</td>
+                    <td>{{ anomaly.anomaly }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
