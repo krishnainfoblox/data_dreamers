@@ -5,16 +5,7 @@ INFOBLOX 2024 - HACKATHON/HACK FEST
 -----------------------------------
 ---- LIBRARIES TO USE ----
 -----------------------------------
-# pip install pyspark
-# pip install pandas
-# pip install openpyxl
-# pip install datetime
-# pip install pandas openpyxl psycopg2-binary
-# pip install flask
-# pip install
-# pip install XlsxWriter
-# pip install pandas openpyxl xlrd
-# pip install mysql-connector-python
+# pip install pyspark pandas openpyxl datetime psycopg2-binary flask XlsxWriter xlrd mysql-connector-python
 
 # brew install node
 
@@ -33,7 +24,6 @@ import subprocess
 from awsrs import aws_check_nulls, aws_check_nulls_table, aws_find_duplicates, aws_full_data_validation
 from mysqldb import mysql_check_nulls, mysql_check_nulls_table, mysql_find_duplicates, mysql_full_data_validation
 from filevalidation import read_csv, read_json, read_parquet, comparedf
-
 
 app = Flask(__name__)
 
@@ -56,16 +46,20 @@ def aws_home():
 def mysql_home():
     return render_template('mysql.html')
 
+
 frontend_path = '/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/frontend'
 backend_path = '/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/backend'
+
 
 @app.route('/bi-performance-testing')
 def bi_performance():
     return redirect('http://localhost:5173/')
 
-@app.route('/bi-Validation-download')
+
+@app.route('/bi-Validation')
 def download_crosstab():
     return render_template('bi_download_crosstab.html')
+
 
 @app.route('/file')
 def file_home():
@@ -210,6 +204,11 @@ def file_validation_route():
 
     # If method is GET, render the form
     return render_template('validate_files.html')
+
+
+@app.route('/file-to-database-validation')
+def file_vs_db():
+    return render_template('file_to_database_validation.html')
 
 
 if __name__ == '__main__':

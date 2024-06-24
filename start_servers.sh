@@ -73,7 +73,8 @@ start_servers_in_background # Uncomment to start servers in the background
 sleep 7
 
 # Activate virtual environment (adjust the path to your virtual environment)
-# source /path/to/your/venv/bin/activate
+source /Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamer_24-jun/data_dreamers/myenv/bin/activate
+
 
 # Ensure Flask is installed
 pip install flask

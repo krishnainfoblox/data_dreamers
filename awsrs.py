@@ -41,7 +41,7 @@ sparkrs = SparkSession.builder \
 jdbc_url = "jdbc:redshift://localhost:54391/ib-dl-it"
 properties = {
     "user": "kkrishna",
-    "password": "*****",
+    "password": "zY1O6ajaSJnffCYxe8m8",
     "driver": "com.amazon.redshift.jdbc.Driver"
 }
 
@@ -135,8 +135,8 @@ def get_columns(schema_name, table_name):
 
 def aws_full_data_validation():
     # Define file path for the single result file
-    excel_file = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/_raw/aws_validationcheck.xlsx"
-    result_file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamers/RESULT/aws_full_data_validation_results.xlsx"
+    excel_file = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamer_24-jun/data_dreamers/_raw/aws_validationcheck.xlsx"
+    result_file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamer_24-jun/data_dreamers/result/aws_full_data_validation_results.xlsx"
 
     # Null Check from Excel
     def null_check_from_excel(df1):
