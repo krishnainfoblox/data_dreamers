@@ -1,6 +1,6 @@
 """
 CODER - KRISHNA
-INFOBLOX 2024 - HACKATHON/HACK FEST
+INFOBLOX 2024 - HACKATHON/ FEST
 
 -----------------------------------
 ---- LIBRARIES TO USE ----

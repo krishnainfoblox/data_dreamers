@@ -5,7 +5,7 @@ import pandas as pd
 redshift_host = 'localhost'
 redshift_db = 'ib-dl-it'
 redshift_user = 'kkrishna'
-redshift_password = 'zY1O6ajaSJnffCYxe8m8'
+redshift_password = '*****************'
 redshift_port = 54391
 
 # Establishing the connection
