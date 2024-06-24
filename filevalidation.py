@@ -6,8 +6,7 @@ import pandas as pd
 spark = SparkSession.builder.appName("FileValidation").getOrCreate()
 
 
-file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/code-hackathon-2024/_files/"
-
+file_path = "/Users/kkrishna/Library/CloudStorage/OneDrive-InfobloxInc/hackthon-2024/Project/data_dreamer_24-jun/data_dreamers/uploads/"
 
 def handle_empty_values(df: DataFrame) -> DataFrame:
     for column in df.columns:
