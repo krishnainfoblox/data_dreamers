@@ -41,7 +41,7 @@ sparkrs = SparkSession.builder \
 jdbc_url = "jdbc:redshift://localhost:54391/ib-dl-it"
 properties = {
     "user": "kkrishna",
-    "password": "zY1O6ajaSJnffCYxe8m8",
+    "password": "*************",
     "driver": "com.amazon.redshift.jdbc.Driver"
 }
 
