@@ -29,6 +29,7 @@
     </div>
     <script>
         function startValidation() {
+            startTime = new Date().getTime();
             startStopwatch();
             fetch('/004_AWS_full-data-validation', { method: 'POST' })
                 .then(response => response.json())
@@ -36,6 +37,7 @@
                     stopStopwatch();
                     document.getElementById("result").style.visibility = "visible";
                     updateTime(); // Update system time when results are displayed
+                    showElapsedTime(startTime)
                 })
                 .catch(error => console.error('Error:', error));
         }
